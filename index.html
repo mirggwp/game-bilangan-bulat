@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Game Operasi Bilangan Bulat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF8E7; --bg2:#FFEDC2;
+  --surface:#FFFFFF; --surface2:#FFFDF6;
+  --ink:#1C1917; --muted:#78716C; --line:#E7DDC8;
+  --teal:#0F766E; --teal-light:#CCFBF1; --teal-dark:#134E4A;
+  --amber:#D97706; --amber-bg:#FEF3C7;
+  --coral:#DC2626; --coral-bg:#FEE2E2;
+  --green:#15803D; --green-bg:#DCFCE7;
+  --blue:#1D4ED8; --blue-bg:#DBEAFE;
+  --shadow: 0 4px 0 #E7DDC8;
+  --radius: 20px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0C1210; --bg2:#13201C;
+    --surface:#1A2421; --surface2:#1F2E2A;
+    --ink:#F5F5F4; --muted:#A8A29E; --line:#2E3D39;
+    --teal:#2DD4BF; --teal-light:#134E4A; --teal-dark:#CCFBF1;
+    --amber-bg:#451A03; --coral-bg:#450A0A; --green-bg:#052E16; --blue-bg:#172554;
+    --shadow: 0 4px 0 #0A0F0E;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"Plus Jakarta Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+button{font-family:inherit;cursor:pointer}
+.wrap{max-width:760px;margin:0 auto;padding:18px 16px 32px}
+
+/* Top strip */
+.top-strip{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--line);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:700}
+.badge i{width:8px;height:8px;background:#22C55E;border-radius:50%;display:block;box-shadow:0 0 0 4px #22C55E22}
+.sound-btn{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:18px}
+
+/* Hero */
+.hero{background:var(--teal);color:#fff;border-radius:24px;padding:22px 20px 20px;position:relative;overflow:hidden;border:2px solid var(--teal-dark)}
+.hero h1{font-family:"Fredoka",sans-serif;font-size:36px;line-height:0.95;letter-spacing:-0.02em;margin:0;font-weight:700;padding-right:108px}
+@media(max-width:560px){.hero h1{font-size:30px;padding-right:96px}.hero-nums span{width:30px;height:30px;font-size:11px}.hero-nums{right:10px;top:10px}}
+.hero h1 span{color:#FDE68A}
+.hero p{margin:10px 0 0;color:#CCFBF1;font-size:15px;max-width:520px}
+.hero-nums{position:absolute;right:14px;top:14px;display:flex;gap:6px;opacity:.95}
+.hero-nums span{font-family:"Fredoka",sans-serif;font-weight:700;font-size:13px;width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:#ffffff22;border:1px solid #ffffff33;transform:rotate(-4deg)}
+.hero-nums span:nth-child(2){transform:rotate(5deg);background:#F59E0B;color:#fff}
+.hero-nums span:nth-child(3){transform:rotate(-2deg)}
+.stats-row{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.stat{background:#ffffff18;border:1px solid #ffffff22;border-radius:12px;padding:8px 10px;min-width:86px}
+.stat b{display:block;font-size:18px;line-height:1;font-family:"Fredoka",sans-serif}
+.stat small{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.85;font-weight:700}
+
+/* Card */
+.card{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-top:14px}
+.card h2{font-family:"Fredoka",sans-serif;font-size:19px;margin:0 0 4px;letter-spacing:-0.01em}
+.card p.sub{margin:0;color:var(--muted);font-size:14px}
+.label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--muted);margin:16px 0 8px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{border:1.5px solid var(--line);background:var(--surface2);padding:10px 12px;border-radius:999px;font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:8px}
+.pill .sym{width:26px;height:26px;display:grid;place-items:center;border-radius:50%;background:var(--ink);color:var(--bg);font-size:15px;line-height:1}
+.pill.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.pill.active .sym{background:var(--bg);color:var(--ink)}
+.level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:560px){.level-grid{grid-template-columns:1fr}}
+.level-btn{text-align:left;border:1.5px solid var(--line);background:var(--surface2);border-radius:16px;padding:12px}
+.level-btn.active{border-color:var(--teal);background:var(--teal-light);box-shadow:0 3px 0 var(--teal)}
+.level-btn b{font-family:"Fredoka",sans-serif;font-size:16px;display:block}
+.level-btn span{font-size:13px;color:var(--muted);display:block;line-height:1.4;margin-top:2px}
+.cta{width:100%;margin-top:18px;background:#F59E0B;color:#1C1917;border:2px solid #92400E;border-bottom-width:4px;border-radius:16px;padding:16px;font-weight:800;font-size:17px;letter-spacing:-0.01em}
+.cta:active{transform:translateY(2px);border-bottom-width:2px}
+
+/* Rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+@media(max-width:560px){.rules{grid-template-columns:1fr}}
+.rule{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--surface2)}
+.rule b{font-size:14px}
+.rule p{margin:4px 0 0;font-size:13.5px;color:var(--muted);line-height:1.5}
+.rule code{background:var(--amber-bg);color:var(--ink);padding:1px 6px;border-radius:6px;font-weight:700;font-size:13px}
+.sign-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+.sign-table th,.sign-table td{border:1px solid var(--line);padding:8px;text-align:center}
+.sign-table th{background:var(--surface2);font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+
+/* Game HUD */
+.hud{display:flex;gap:8px;align-items:stretch;margin-bottom:12px}
+.hud-item{flex:1;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column}
+.hud-item small{font-size:11px;letter-spacing:.07em;text-transform:uppercase;font-weight:800;color:var(--muted)}
+.hud-item b{font-family:"Fredoka",sans-serif;font-size:20px;line-height:1}
+.hearts{display:flex;gap:2px;font-size:18px;line-height:1}
+.hearts .lost{opacity:.22;filter:grayscale(1)}
+.progress{height:10px;background:var(--line);border-radius:999px;overflow:hidden;margin:10px 0 4px;border:1px solid var(--line)}
+.progress i{display:block;height:100%;background:var(--teal);border-radius:999px;transition:width .4s ease}
+.timerbar{height:8px;background:#FEE2E2;border-radius:999px;overflow:hidden}
+.timerbar i{display:block;height:100%;background:#EF4444;transition:width 1s linear}
+.timerbar.low i{background:#DC2626}
+.qmeta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);font-weight:700;margin-top:6px}
+.question-card{background:var(--surface);border:2px solid var(--ink);border-radius:22px;padding:22px 18px 18px;box-shadow:6px 6px 0 var(--ink);margin-top:10px}
+.q-op{display:inline-flex;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.q-text{font-family:"Fredoka",sans-serif;font-size:52px;line-height:1;text-align:center;letter-spacing:-0.03em;margin:14px 0 6px;font-weight:700}
+.q-text .neg{color:var(--coral)}
+.q-hint{text-align:center;color:var(--muted);font-size:14px;margin:0}
+.numberline{margin:16px auto 2px;max-width:520px}
+.numberline svg{width:100%;height:auto;display:block}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+@media(max-width:420px){.answers{grid-template-columns:1fr 1fr}.q-text{font-size:42px}}
+.ans{border:2px solid var(--line);background:var(--surface);border-bottom-width:4px;border-radius:16px;padding:16px 10px;font-family:"Fredoka",sans-serif;font-size:26px;font-weight:700;text-align:center;transition:.15s}
+.ans:hover{border-color:var(--ink)}
+.ans.correct{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.ans.wrong{background:var(--coral-bg);border-color:var(--coral);color:var(--coral);animation:shake .35s}
+.ans.dim{opacity:.45}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.feedback{border-radius:16px;padding:14px;margin-top:14px;display:none}
+.feedback.show{display:block}
+.feedback.ok{background:var(--green-bg);border:1.5px solid #86EFAC}
+.feedback.no{background:var(--coral-bg);border:1.5px solid #FCA5A5}
+.feedback b{font-family:"Fredoka",sans-serif}
+.feedback p{margin:4px 0 0;font-size:14px;line-height:1.6}
+.next-btn{width:100%;margin-top:12px;background:var(--ink);color:var(--bg);border:none;border-radius:14px;padding:14px;font-weight:800;font-size:15px;display:none}
+.next-btn.show{display:block}
+.quit{background:none;border:none;color:var(--muted);font-weight:700;font-size:13px;text-decoration:underline;text-underline-offset:3px}
+
+/* Result */
+.result-hero{text-align:center;padding:8px 0 4px}
+.stars{font-size:36px;letter-spacing:4px;line-height:1}
+.result-hero h2{font-family:"Fredoka",sans-serif;font-size:32px;margin:8px 0 4px;line-height:1}
+.result-score{font-family:"Fredoka",sans-serif;font-size:56px;line-height:1;color:var(--teal)}
+.review{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.review-item{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface2)}
+.review-item .q{font-weight:700;font-family:"Fredoka",sans-serif;font-size:16px}
+.review-item .a{font-size:13px;color:var(--muted)}
+.pill-result{font-size:12px;font-weight:800;padding:5px 8px;border-radius:999px;white-space:nowrap}
+.pill-result.ok{background:var(--green-bg);color:var(--green)}
+.pill-result.no{background:var(--coral-bg);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+@media(max-width:520px){.grid2{grid-template-columns:1fr}}
+.secondary{width:100%;padding:14px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);font-weight:800}
+.primary{width:100%;padding:14px;border-radius:14px;border:2px solid #92400E;border-bottom-width:4px;background:#F59E0B;color:#111;font-weight:800}
+.hidden{display:none !important}
+.kbd{font-size:11px;background:var(--ink);color:var(--bg);padding:2px 6px;border-radius:6px;font-weight:700}
+.footer-note{text-align:center;color:var(--muted);font-size:13px;margin-top:16px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-strip">
+    <div class="badge"><i></i> Matematika • Kelas 7 SMP • Bilangan Bulat</div>
+    <button class="sound-btn" id="soundToggle" aria-label="Suara">🔊</button>
+  </div>
+
+  <!-- HOME -->
+  <section id="screen-home">
+    <div class="hero">
+      <div class="hero-nums"><span>-7</span><span>×</span><span>+5</span></div>
+      <h1>Petualangan<br><span>Bilangan Bulat</span></h1>
+      <p>Latih otakmu dengan soal penjumlahan, pengurangan, perkalian, dan pembagian bilangan negatif &amp; positif. Kumpulkan poin, jaga nyawamu, dan raih 3 bintang!</p>
+      <div class="stats-row">
+        <div class="stat"><b>10</b><small>Soal / Ronde</small></div>
+        <div class="stat"><b>20 dtk</b><small>Per Soal</small></div>
+        <div class="stat"><b>3 ❤️</b><small>Nyawa</small></div>
+        <div class="stat"><b id="bestScoreLabel">—</b><small>Skor Terbaikmu</small></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Mau main mode apa?</h2>
+      <p class="sub">Pilih operasi dan levelnya. Mode Campuran paling menantang karena semua operasi muncul bergantian.</p>
+
+      <div class="label">Pilih Operasi</div>
+      <div class="pills" id="modePills">
+        <button class="pill active" data-mode="mixed"><span class="sym">🎲</span> Campuran</button>
+        <button class="pill" data-mode="add"><span class="sym">+</span> Penjumlahan</button>
+        <button class="pill" data-mode="sub"><span class="sym">−</span> Pengurangan</button>
+        <button class="pill" data-mode="mul"><span class="sym">×</span> Perkalian</button>
+        <button class="pill" data-mode="div"><span class="sym">÷</span> Pembagian</button>
+      </div>
+
+      <div class="label">Pilih Level</div>
+      <div class="level-grid" id="levelGrid">
+        <button class="level-btn active" data-level="easy"><b>🌱 Mudah</b><span>Angka -10 s.d. 10<br>Cocok untuk pemanasan</span></button>
+        <button class="level-btn" data-level="medium"><b>🔥 Sedang</b><span>Angka -20 s.d. 20<br>Sedikit lebih tricky</span></button>
+        <button class="level-btn" data-level="hard"><b>🏆 Sulit</b><span>Angka -50 s.d. 50<br>Untuk jagoan hitung</span></button>
+      </div>
+
+      <button class="cta" id="startBtn">▶ &nbsp;Mulai Bermain — 10 Soal</button>
+      <p style="text-align:center;margin:10px 0 0;font-size:13px;color:var(--muted)">Tekan angka <span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> <span class="kbd">4</span> di keyboard untuk menjawab cepat</p>
+    </div>
+
+    <div class="card">
+      <h2>Ingat-ingat dulu yuk! 📚</h2>
+      <p class="sub">Kunci bilangan bulat itu cuma soal tanda. Kuasai ini, soal jadi gampang.</p>
+      <div class="rules">
+        <div class="rule"><b>➕ Penjumlahan</b><p>Tanda sama → jumlahkan, tanda ikut. <code>-4 + (-3) = -7</code><br>Tanda beda → kurangkan, ikut tanda angka terbesar. <code>-7 + 10 = 3</code></p></div>
+        <div class="rule"><b>➖ Pengurangan</b><p>Kurangi = tambah lawannya. <code>5 - (-3) = 5 + 3 = 8</code><br><code>-2 - 4 = -2 + (-4) = -6</code></p></div>
+        <div class="rule"><b>✖️ Perkalian</b><p>Tanda sama hasilnya <b>positif</b>, tanda beda hasilnya <b>negatif</b>.<br><code>(-3) × (-4) = 12</code> • <code>(-3) × 4 = -12</code></p></div>
+        <div class="rule"><b>➗ Pembagian</b><p>Aturan tandanya sama seperti perkalian.<br><code>(-12) ÷ 3 = -4</code> • <code>(-12) ÷ (-3) = 4</code></p></div>
+      </div>
+      <table class="sign-table" aria-label="Aturan tanda perkalian dan pembagian">
+        <tr><th></th><th>+ × +</th><th>- × -</th><th>+ × -</th><th>- × +</th></tr>
+        <tr><td><b>Hasil</b></td><td style="color:var(--green);font-weight:800">POSITIF +</td><td style="color:var(--green);font-weight:800">POSITIF +</td><td style="color:var(--coral);font-weight:800">NEGATIF −</td><td style="color:var(--coral);font-weight:800">NEGATIF −</td></tr>
+      </table>
+      <p style="font-size:13.5px;color:var(--muted);margin:12px 0 0;line-height:1.6"><b style="color:var(--ink)">Trik garis bilangan:</b> Bayangkan kamu berdiri di garis bilangan. Tambah = melangkah ke kanan, kurang = melangkah ke kiri. Angka negatif itu seperti utang — kalau utangmu berkurang, kamu jadi lebih kaya!</p>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section id="screen-game" class="hidden">
+    <div class="hud">
+      <div class="hud-item"><small>Skor</small><b id="hudScore">0</b></div>
+      <div class="hud-item"><small>Streak 🔥</small><b id="hudStreak">0x</b></div>
+      <div class="hud-item"><small>Nyawa</small><div class="hearts" id="hudHearts"><span>❤️</span><span>❤️</span><span>❤️</span></div></div>
+      <div class="hud-item"><small>Soal</small><b id="hudQ">1 / 10</b></div>
+    </div>
+    <div class="progress"><i id="progressBar" style="width:10%"></i></div>
+    <div class="qmeta"><span id="qMetaLeft">Soal 1 dari 10</span><span id="timerText">⏱️ 20 detik</span></div>
+    <div class="timerbar" style="margin-top:6px"><i id="timerBar" style="width:100%"></i></div>
+
+    <div class="question-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="q-op" id="qOpBadge" style="background:var(--amber-bg)">Campuran</span>
+        <span style="font-size:13px;font-weight:700;color:var(--muted)" id="qPoints">+100 poin</span>
+      </div>
+      <div class="q-text" id="qText">-5 + 8 = ?</div>
+      <p class="q-hint" id="qHint">Pilih jawaban yang benar di bawah ini</p>
+      <div class="numberline" id="numberLineWrap"></div>
+      <div class="answers" id="answersWrap"></div>
+
+      <div class="feedback" id="feedbackBox">
+        <b id="feedbackTitle">Benar! 🎉</b>
+        <p id="feedbackText"></p>
+      </div>
+      <button class="next-btn" id="nextBtn">Soal Berikutnya →</button>
+    </div>
+    <div style="text-align:center;margin-top:12px"><button class="quit" id="quitBtn">Berhenti &amp; kembali ke menu</button></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="screen-result" class="hidden">
+    <div class="card" style="padding:22px 18px">
+      <div class="result-hero">
+        <div class="stars" id="resultStars">⭐⭐⭐</div>
+        <h2 id="resultTitle">Luar Biasa!</h2>
+        <p style="color:var(--muted);margin:0" id="resultSubtitle">Kamu menyelesaikan ronde ini</p>
+        <div class="result-score" id="resultScore">850</div>
+        <div style="font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">Total Skor</div>
+      </div>
+
+      <div class="hud" style="margin-top:16px">
+        <div class="hud-item"><small>Benar</small><b id="resCorrect">8 / 10</b></div>
+        <div class="hud-item"><small>Akurasi</small><b id="resAccuracy">80%</b></div>
+        <div class="hud-item"><small>Streak Terbaik</small><b id="resStreak">5x 🔥</b></div>
+      </div>
+
+      <div class="label">Review Jawabanmu</div>
+      <div class="review" id="reviewList"></div>
+
+      <div class="grid2">
+        <button class="secondary" id="backHomeBtn">← Kembali ke Menu</button>
+        <button class="primary" id="playAgainBtn">🔁 Main Lagi</button>
+      </div>
+      <p class="footer-note" id="resultTip">💡 Tip: Kalau sering salah di pengurangan, ingat — mengurang bilangan negatif sama dengan menambah.</p>
+    </div>
+  </section>
+
+  <p class="footer-note">Dibuat untuk latihan Matematika SMP — Bab Bilangan Bulat.<br>Semakin sering latihan, semakin cepat dan teliti kamu berhitung!</p>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+let selectedMode = 'mixed';
+let selectedLevel = 'easy';
+let soundOn = true;
+let bestScore = 0;
+
+let game = null;
+let timerInterval = null;
+let timeLeft = 20;
+let answered = false;
+
+// Audio - simple WebAudio beeps
+let audioCtx = null;
+function ensureAudio(){ if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); }
+function beep(freq, dur=0.12, type='sine', vol=0.15){
+  if(!soundOn) return; ensureAudio(); if(!audioCtx) return;
+  const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+  o.type=type; o.frequency.value=freq; g.gain.value=vol;
+  o.connect(g); g.connect(audioCtx.destination); o.start();
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+dur); o.stop(audioCtx.currentTime+dur);
+}
+function soundCorrect(){ beep(660,0.1,'sine',0.18); setTimeout(()=>beep(880,0.14,'sine',0.18),90); }
+function soundWrong(){ beep(180,0.2,'sawtooth',0.12); }
+function soundClick(){ beep(520,0.06,'sine',0.08); }
+
+$('#soundToggle').addEventListener('click', ()=>{
+  soundOn = !soundOn;
+  $('#soundToggle').textContent = soundOn ? '🔊' : '🔇';
+  if(soundOn) soundClick();
+});
+
+// Mode & level selection
+$$('#modePills .pill').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    $$('#modePills .pill').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); selectedMode = btn.dataset.mode; soundClick();
+  });
+});
+$$('#levelGrid .level-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    $$('#levelGrid .level-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); selectedLevel = btn.dataset.level; soundClick();
+  });
+});
+
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function rangeForLevel(){
+  if(selectedLevel==='easy') return {main:10, mul:5, div:6};
+  if(selectedLevel==='medium') return {main:20, mul:10, div:10};
+  return {main:50, mul:12, div:12};
+}
+function pickNonZero(min,max){ let n=0; while(n===0) n=randInt(min,max); return n; }
+
+function fmt(n){ return n<0 ? `(${n})` : `${n}`; }
+function fmtPlain(n){ return `${n}`; }
+
+function generateQuestion(){
+  const ops = selectedMode==='mixed' ? ['add','sub','mul','div'] : [selectedMode];
+  const op = ops[randInt(0,ops.length-1)];
+  const R = rangeForLevel();
+  let a,b,answer,exprHtml,exprText,explain='', opLabel='', opColor='';
+
+  if(op==='add'){
+    a = randInt(-R.main,R.main); b = randInt(-R.main,R.main);
+    if(a===0 && b===0) b=3;
+    answer = a+b;
+    exprText = `${a} + ${b}`;
+    exprHtml = `${fmt(a)} + ${fmt(b)}`;
+    opLabel='Penjumlahan'; opColor='var(--blue-bg)';
+    if(a>=0 && b>=0) explain = `${a} + ${b} = ${answer}. Keduanya positif, langsung jumlahkan.`;
+    else if(a<0 && b<0) explain = `Keduanya negatif (seperti utang + utang): jumlahkan angkanya ${Math.abs(a)}+${Math.abs(b)}=${Math.abs(answer)}, hasilnya negatif → ${answer}.`;
+    else explain = `Tanda berbeda: kurangkan angka besar dikurangi kecil (${Math.max(Math.abs(a),Math.abs(b))} − ${Math.min(Math.abs(a),Math.abs(b))} = ${Math.abs(answer)}), lalu ikut tanda angka yang lebih besar → ${answer}.`;
+  } else if(op==='sub'){
+    a = randInt(-R.main,R.main); b = randInt(-R.main,R.main);
+    answer = a-b;
+    exprText = `${a} - ${b}`;
+    exprHtml = `${fmt(a)} − ${fmt(b)}`;
+    opLabel='Pengurangan'; opColor='var(--amber-bg)';
+    if(b<0) explain = `Mengurang bilangan negatif = menambah: ${a} − (${b}) = ${a} + ${Math.abs(b)} = ${answer}.`;
+    else if(a<0) explain = `${a} − ${b} artinya bergerak ke kiri lagi dari ${a} sejauh ${b} → ${answer}.`;
+    else explain = `${a} − ${b} = ${answer}. Kurangkan seperti biasa dan perhatikan tandanya.`;
+  } else if(op==='mul'){
+    a = pickNonZero(-R.mul,R.mul); b = pickNonZero(-R.mul,R.mul);
+    answer = a*b;
+    exprText = `${a} × ${b}`;
+    exprHtml = `${fmt(a)} × ${fmt(b)}`;
+    opLabel='Perkalian'; opColor='#FCE7F3';
+    const same = (a>0 && b>0)||(a<0 && b<0);
+    explain = `${Math.abs(a)} × ${Math.abs(b)} = ${Math.abs(answer)}. Tanda ${same?'sama → hasilnya POSITIF':'berbeda → hasilnya NEGATIF'} → ${answer}.`;
+  } else {
+    // div: ensure integer
+    b = pickNonZero(-R.div,R.div);
+    const q = pickNonZero(-R.div,R.div);
+    a = b*q; answer = q;
+    exprText = `${a} ÷ ${b}`;
+    exprHtml = `${fmt(a)} ÷ ${fmt(b)}`;
+    opLabel='Pembagian'; opColor='var(--green-bg)';
+    const same = (a>0 && b>0)||(a<0 && b<0);
+    explain = `${Math.abs(a)} ÷ ${Math.abs(b)} = ${Math.abs(answer)}. Tanda ${same?'sama → POSITIF':'berbeda → NEGATIF'} → ${answer}. Cek: ${b} × ${answer} = ${a}.`;
+  }
+
+  // Distractors
+  const distractors = new Set();
+  const candidates = [answer+1, answer-1, answer+2, answer-2, answer+10, answer-10, -answer, answer+ (randInt(3,5)), answer - (randInt(3,5))];
+  // shuffle candidates
+  candidates.sort(()=>Math.random()-0.5);
+  for(const c of candidates){ if(c!==answer && distractors.size<3) distractors.add(c); }
+  while(distractors.size<3){ const c = answer + randInt(-8,8); if(c!==answer) distractors.add(c); }
+  const options = [...distractors, answer].sort(()=>Math.random()-0.5);
+
+  return {op,a,b,answer,exprHtml,exprText,explain,opLabel,opColor,options};
+}
+
+function renderNumberLine(q){
+  const wrap = $('#numberLineWrap');
+  if(q.op!=='add' && q.op!=='sub'){ wrap.innerHTML=''; return; }
+  // Show simple number line from -12 to 12 if within, else hide ticks labels partially
+  const min = -12, max = 12;
+  const clamp = v => Math.max(min, Math.min(max, v));
+  const aC = clamp(q.a);
+  const ansC = clamp(q.answer);
+  const xFor = v => 20 + ((v - min)/(max-min))*460;
+  const y=34;
+  let ticks='';
+  for(let i=min;i<=max;i+=2){
+    const x=xFor(i);
+    ticks+=`<line x1="${x}" y1="${y-5}" x2="${x}" y2="${y+5}" stroke="var(--muted)" stroke-width="1"/><text x="${x}" y="${y+20}" text-anchor="middle" font-size="9" fill="var(--muted)">${i}</text>`;
+  }
+  const hasArrow = ansC!==aC;
+  wrap.innerHTML = `
+  <svg viewBox="0 0 500 62" role="img" aria-label="Garis bilangan">
+    <line x1="10" y1="${y}" x2="490" y2="${y}" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+    ${ticks}
+    ${hasArrow?`<path d="M ${xFor(aC)} ${y-14} Q ${(xFor(aC)+xFor(ansC))/2} ${y-28} ${xFor(ansC)} ${y-14}" fill="none" stroke="var(--teal)" stroke-width="2.5" marker-end="url(#arr)"/>`:''}
+    <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--teal)"/></marker></defs>
+    <circle cx="${xFor(aC)}" cy="${y}" r="7" fill="#F59E0B" stroke="#fff" stroke-width="2"/>
+    <text x="${xFor(aC)}" y="${y-18}" text-anchor="middle" font-size="11" font-weight="800" fill="var(--ink)">Mulai ${q.a}</text>
+    <circle cx="${xFor(ansC)}" cy="${y}" r="7" fill="var(--teal)" stroke="#fff" stroke-width="2"/>
+    <text x="${xFor(ansC)}" y="${y-18}" text-anchor="middle" font-size="11" font-weight="800" fill="var(--teal)">${q.answer}</text>
+  </svg>
+  <p style="text-align:center;font-size:12px;color:var(--muted);margin:2px 0 0">Garis bilangan: mulai dari ${q.a}, ${q.op==='add' ? (q.b>=0?`maju ${q.b} ke kanan`:`mundur ${Math.abs(q.b)} ke kiri`) : (q.b>=0?`mundur ${q.b} ke kiri`:`maju ${Math.abs(q.b)} ke kanan (karena minus ketemu minus)`)} → sampai di ${q.answer}</p>`;
+}
+
+function startGame(){
+  ensureAudio(); soundClick();
+  game = { idx:0, score:0, streak:0, bestStreak:0, lives:3, correct:0, total:10, history:[], current:null };
+  $('#screen-home').classList.add('hidden');
+  $('#screen-result').classList.add('hidden');
+  $('#screen-game').classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+  nextQuestion(true);
+}
+
+function startTimer(){
+  clearInterval(timerInterval);
+  timeLeft = 20; answered=false;
+  updateTimerUI();
+  timerInterval = setInterval(()=>{
+    timeLeft--; updateTimerUI();
+    if(timeLeft<=5 && timeLeft>0) beep(900,0.05,'sine',0.06);
+    if(timeLeft<=0){ clearInterval(timerInterval); onTimeout(); }
+  },1000);
+}
+function updateTimerUI(){
+  $('#timerText').textContent = `⏱️ ${Math.max(0,timeLeft)} detik`;
+  $('#timerBar').style.width = `${(timeLeft/20)*100}%`;
+  $('#timerBar').parentElement.classList.toggle('low', timeLeft<=5);
+}
+
+function nextQuestion(first=false){
+  if(!first) game.idx++;
+  if(game.idx>=game.total || game.lives<=0){ endGame(); return; }
+  const q = generateQuestion();
+  game.current = q;
+  answered=false;
+  // HUD
+  $('#hudScore').textContent = game.score;
+  $('#hudStreak').textContent = game.streak+'x';
+  $('#hudQ').textContent = `${game.idx+1} / ${game.total}`;
+  $('#qMetaLeft').textContent = `Soal ${game.idx+1} dari ${game.total} • ${selectedLevel==='easy'?'Mudah':selectedLevel==='medium'?'Sedang':'Sulit'}`;
+  $('#progressBar').style.width = `${((game.idx)/game.total)*100}%`;
+  renderHearts();
+  // Question
+  const badge = $('#qOpBadge'); badge.textContent = q.opLabel; badge.style.background = q.opColor; badge.style.color='var(--ink)';
+  $('#qText').innerHTML = q.exprHtml.replace(/-/g,'−') + ' = ?';
+  $('#qHint').textContent = q.op==='mul'||q.op==='div' ? 'Ingat aturan tanda: sama = positif, beda = negatif' : 'Gunakan garis bilangan di bawah untuk membantumu';
+  $('#qPoints').textContent = `+${100 + game.streak*10} poin jika benar`;
+  renderNumberLine(q);
+  // Answers
+  const wrap = $('#answersWrap'); wrap.innerHTML='';
+  q.options.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='ans'; btn.textContent = opt; btn.dataset.val=opt;
+    btn.innerHTML = `<span style="font-size:11px;opacity:.6;display:block;font-family:var(--font)">Tekan ${i+1}</span>${opt}`;
+    btn.addEventListener('click', ()=>selectAnswer(btn,opt));
+    wrap.appendChild(btn);
+  });
+  $('#feedbackBox').className='feedback'; $('#feedbackBox').style.display='none';
+  $('#nextBtn').classList.remove('show');
+  startTimer();
+}
+
+function renderHearts(){
+  const h = $('#hudHearts');
+  h.innerHTML = [0,1,2].map(i=>`<span class="${i<game.lives?'':'lost'}">❤️</span>`).join('');
+}
+
+function selectAnswer(btn, val){
+  if(answered) return; answered=true; clearInterval(timerInterval);
+  const q = game.current; const isCorrect = val===q.answer;
+  // mark buttons
+  $$('#answersWrap .ans').forEach(b=>{
+    const v=parseInt(b.dataset.val,10);
+    if(v===q.answer) b.classList.add('correct');
+    else if(b===btn && !isCorrect) b.classList.add('wrong');
+    else b.classList.add('dim');
+    b.disabled=true;
+  });
+  const fb = $('#feedbackBox'); fb.style.display='block';
+  if(isCorrect){
+    game.correct++; game.streak++; game.bestStreak=Math.max(game.bestStreak,game.streak);
+    const timeBonus = timeLeft*2;
+    const streakBonus = (game.streak-1)*10;
+    const gained = 100 + timeBonus + streakBonus;
+    game.score += gained;
+    fb.className='feedback show ok';
+    $('#feedbackTitle').textContent = game.streak>=3 ? `🔥 Benar! Streak ${game.streak}x — +${gained} poin` : `✅ Benar! +${gained} poin`;
+    $('#feedbackText').textContent = q.explain + (timeBonus?` Bonus kecepatan +${timeBonus}.`:'') + (streakBonus?` Bonus streak +${streakBonus}.`:'');
+    soundCorrect();
+  } else {
+    game.streak=0; game.lives--;
+    fb.className='feedback show no';
+    $('#feedbackTitle').textContent = `❌ Yah, kurang tepat — Jawabannya ${q.answer}`;
+    $('#feedbackText').textContent = q.explain;
+    soundWrong();
+  }
+  game.history.push({q:q.exprText, answer:q.answer, user:val, correct:isCorrect});
+  $('#hudScore').textContent = game.score;
+  $('#hudStreak').textContent = game.streak+'x';
+  renderHearts();
+  $('#progressBar').style.width = `${((game.idx+1)/game.total)*100}%`;
+  const nb = $('#nextBtn');
+  nb.textContent = (game.idx+1>=game.total || game.lives<=0) ? 'Lihat Hasil Akhir →' : 'Soal Berikutnya →';
+  nb.classList.add('show');
+  nb.focus();
+}
+
+function onTimeout(){
+  if(answered) return; answered=true;
+  const q=game.current;
+  $$('#answersWrap .ans').forEach(b=>{
+    const v=parseInt(b.dataset.val,10);
+    if(v===q.answer) b.classList.add('correct'); else b.classList.add('dim');
+    b.disabled=true;
+  });
+  game.streak=0; game.lives--;
+  const fb=$('#feedbackBox'); fb.style.display='block'; fb.className='feedback show no';
+  $('#feedbackTitle').textContent = `⏰ Waktu habis! Jawabannya ${q.answer}`;
+  $('#feedbackText').textContent = q.explain;
+  game.history.push({q:q.exprText, answer:q.answer, user:'— (waktu habis)', correct:false});
+  renderHearts(); soundWrong();
+  const nb=$('#nextBtn'); nb.textContent=(game.idx+1>=game.total||game.lives<=0)?'Lihat Hasil Akhir →':'Soal Berikutnya →'; nb.classList.add('show');
+}
+
+function endGame(){
+  clearInterval(timerInterval);
+  $('#screen-game').classList.add('hidden');
+  $('#screen-result').classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+  const totalAnswered = game.history.length || 1;
+  const acc = Math.round((game.correct/totalAnswered)*100);
+  if(game.score>bestScore){ bestScore=game.score; $('#bestScoreLabel').textContent=bestScore; }
+  // Stars
+  let stars='☆☆☆', title='', sub='';
+  if(game.lives<=0 && game.correct<game.total){ title='Nyawamu Habis!'; sub='Tidak apa-apa, coba lagi dan lebih teliti ya.'; }
+  if(acc>=90){ stars='⭐⭐⭐'; title='Luar Biasa! Kamu Master Bilangan Bulat!'; sub='Nyaris sempurna. Pertahankan!'; }
+  else if(acc>=70){ stars='⭐⭐☆'; title='Hebat! Sedikit lagi sempurna'; sub='Kamu sudah paham aturan tandanya.'; }
+  else if(acc>=50){ stars='⭐☆☆'; title='Bagus, Terus Latihan Ya!'; sub='Cek review di bawah, pelajari yang masih salah.'; }
+  else if(game.lives>0){ stars='☆☆☆'; title='Jangan Menyerah!'; sub='Baca lagi ingatan tandanya, lalu coba ronde baru.'; }
+  $('#resultStars').textContent=stars;
+  $('#resultTitle').textContent=title;
+  $('#resultSubtitle').textContent=sub;
+  $('#resultScore').textContent=game.score;
+  $('#resCorrect').textContent=`${game.correct} / ${totalAnswered}`;
+  $('#resAccuracy').textContent=`${acc}%`;
+  $('#resStreak').textContent=`${game.bestStreak}x 🔥`;
+  const list=$('#reviewList'); list.innerHTML='';
+  game.history.forEach((h,i)=>{
+    const div=document.createElement('div'); div.className='review-item';
+    div.innerHTML=`<div><div class="q">${i+1}. ${h.q.replace(/-/g,'−')} = ${h.answer}</div><div class="a">Jawabanmu: ${h.user}</div></div><span class="pill-result ${h.correct?'ok':'no'}">${h.correct?'✓ Benar':'✕ Salah'}</span>`;
+    list.appendChild(div);
+  });
+  // Tip based on mistakes
+  const wrongOps = game.history.filter(h=>!h.correct);
+  let tip='💡 Semua jawabanmu bagus! Coba naik level ke yang lebih sulit untuk tantangan baru.';
+  if(wrongOps.length){
+    const hasMulDiv = wrongOps.some(h=>h.q.includes('×')||h.q.includes('÷'));
+    const hasSub = wrongOps.some(h=>h.q.includes('-'));
+    if(hasMulDiv) tip='💡 Tip: Untuk × dan ÷, cek tandanya dulu — sama hasilnya positif, beda hasilnya negatif. Baru hitung angkanya.';
+    else if(hasSub) tip='💡 Tip: Pengurangan itu tricky! Ubah jadi penjumlahan lawannya: a − (−b) = a + b.';
+    else tip='💡 Tip: Gunakan garis bilangan — mulai dari angka pertama, lalu melangkah ke kanan (tambah) atau kiri (kurang).';
+  }
+  $('#resultTip').textContent=tip;
+  if(acc>=70){ beep(523,0.12); setTimeout(()=>beep(659,0.12),120); setTimeout(()=>beep(784,0.2),240); }
+}
+
+$('#startBtn').addEventListener('click', startGame);
+$('#nextBtn').addEventListener('click', ()=>{ soundClick(); nextQuestion(); });
+$('#quitBtn').addEventListener('click', ()=>{ clearInterval(timerInterval); $('#screen-game').classList.add('hidden'); $('#screen-home').classList.remove('hidden'); });
+$('#playAgainBtn').addEventListener('click', startGame);
+$('#backHomeBtn').addEventListener('click', ()=>{ $('#screen-result').classList.add('hidden'); $('#screen-home').classList.remove('hidden'); window.scrollTo({top:0}); });
+
+document.addEventListener('keydown', (e)=>{
+  if($('#screen-game').classList.contains('hidden')) return;
+  if(e.key>='1' && e.key<='4'){
+    const idx=parseInt(e.key,10)-1;
+    const btns=$$('#answersWrap .ans');
+    if(btns[idx] && !answered) btns[idx].click();
+  }
+  if(e.key==='Enter' && $('#nextBtn').classList.contains('show')) $('#nextBtn').click();
+});
+</script>
+</body>
+</html>
